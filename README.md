@@ -1,4 +1,4 @@
-[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE) [![Build Status](https://travis-ci.org/frontyard/cordova-plugin-android-utilities.svg?branch=master)](https://travis-ci.org/frontyard/cordova-plugin-android-utilities)
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE) [![Build Status](https://travis-ci.org/frontyard/cordova-plugin-android-utilities.svg?branch=master)](https://travis-ci.org/frontyard/cordova-plugin-android-utilities) [![Code Climate](https://codeclimate.com/github/frontyard/cordova-plugin-android-utilities/badges/gpa.svg)](https://codeclimate.com/github/frontyard/cordova-plugin-android-utilities)
 # cordova-plugin-android-utilities
 
 Collection of various utilities for Cordova/Phonegap apps.
