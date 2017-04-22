@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin
+	xmlns="http://apache.org/cordova/ns/plugins/1.0"
+	id="cordova-plugin-android-utilities"
+	version="1.0.0">
+	<name>AndroidUtilities</name>
+	<description>Collection of various utilities for Cordova/Phonegap apps.</description>
+	<license>MIT</license>
+	<keywords>cordova,phonegap</keywords>
+	<author>Nedim Cholich</author>
+
+	<js-module src="www/utilities.js" name="AndroidUtilities">
+		<clobbers target="AndroidUtilities" />
+	</js-module>
+
+	<engines>
+		<engine name="cordova" version=">=4.0.0" />
+	</engines>
+
+	<platform name="android">
+		<config-file target="res/xml/config.xml" parent="/*">
+			<feature name="AndroidUtilities">
+				<param name="android-package" value="co.frontyard.cordova.plugin.utilities.AndroidUtilities" />
+			</feature>
+		</config-file>
+		<source-file src="src/android/AndroidUtilities.java" target-dir="src/co/frontyard/cordova/plugin/utilities" />
+	</platform>
+</plugin>

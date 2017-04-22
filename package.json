@@ -1,0 +1,36 @@
+{
+  "name": "cordova-plugin-android-utilities",
+  "version": "1.0.0",
+  "description": "Collection of various utilities for Cordova/Phonegap apps.",
+  "cordova": {
+    "id": "cordova-plugin-android-utilities",
+    "platforms": [
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frontyard/cordova-plugin-android-utilities.git"
+  },
+  "keywords": [
+    "phonegap",
+    "cordova",
+    "android",
+    "cordova-android"
+  ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=4.0.0"
+    }
+  ],
+  "author": "Nedim Cholich",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/frontyard/cordova-plugin-android-utilities/issues"
+  },
+  "homepage": "https://github.com/frontyard/cordova-plugin-android-utilities#readme",
+  "devDependencies": {
+    "jshint": "^2.9.0"
+  }
+}
