@@ -12,7 +12,7 @@ Get application build info
 ```js
 window.AndroidUtilities.getApplicationInfo(successCallback, errorCallback)
 ```
-successCallback will receive application build info through it's first parameter. Following properties are available:
+successCallback will receive application build info through its first parameter. Following properties are available:
 * debug
 * displayName
 * basePackageName
