@@ -21,6 +21,7 @@
 		<config-file target="res/xml/config.xml" parent="/*">
 			<feature name="AndroidUtilities">
 				<param name="android-package" value="co.frontyard.cordova.plugin.utilities.AndroidUtilities" />
+				<param name="onload" value="true" />
 			</feature>
 		</config-file>
 		<source-file src="src/android/AndroidUtilities.java" target-dir="src/co/frontyard/cordova/plugin/utilities" />

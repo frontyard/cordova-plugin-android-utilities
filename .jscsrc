@@ -1,0 +1,38 @@
+{
+    "disallowMixedSpacesAndTabs": true,
+    "validateIndentation": 4,
+    "disallowSpacesInFunctionDeclaration": {
+        "beforeOpeningRoundBrace": true
+    },
+    "requireSpacesInFunctionDeclaration": {
+        "beforeOpeningCurlyBrace": true
+    },
+    "requireSpacesInAnonymousFunctionExpression": {
+        "beforeOpeningRoundBrace": true,
+        "beforeOpeningCurlyBrace": true
+    },
+    "disallowSpacesInCallExpression": true,
+    "requireSpaceAfterKeywords": ["if","else","for","while","do","switch","try","catch","finally"],
+    "requireSpaceAfterBinaryOperators": true,
+    "requireSpaceBeforeBinaryOperators": true,
+    "requireSpaceBeforeBlockStatements": true,
+    "requireSpaceBeforeKeywords": ["else","while","catch","finally"],
+    "disallowSpacesInsideParentheses": true,
+    "requireSpacesInConditionalExpression": true,
+    "requireSpaceBetweenArguments": true,
+    "disallowSpaceAfterObjectKeys": true,
+    "requireSpaceBeforeObjectValues": true,
+    "disallowMultipleLineBreaks": true, /* Current style allows for 2 blank lines. */
+    //  "disallowMultipleSpaces": true,
+    "requireCurlyBraces": ["if","else","for","while","do"],
+    "disallowNewlineBeforeBlockStatements": true,
+    /** No enfocement in current style. */
+    "requireSpacesInForStatement": true,
+    "disallowMultipleLineStrings": true,
+    "requireSemicolons": true,
+    /** From JSHint */
+    "validateQuoteMarks": "'", /* quotmark */
+    "maximumLineLength": 180, /* maxlen */
+    //  "disallowEmptyBlocks": true, /* noempty */
+    "requireParenthesesAroundIIFE": true /* immed */
+}

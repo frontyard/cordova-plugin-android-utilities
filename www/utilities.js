@@ -22,8 +22,12 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+
 module.exports = {
-    shortcut: function (successCallback, errorCallback) {
-        cordova.exec(successCallback, errorCallback, "AndroidUtilities", "shortcut", []);
+    getApplicationInfo: function (successCallback, errorCallback) {
+        cordova.exec(successCallback, errorCallback, 'AndroidUtilities', 'getApplicationInfo', []);
+    },
+    createDesktopShortcut: function (successCallback, errorCallback) {
+        cordova.exec(successCallback, errorCallback, 'AndroidUtilities', 'createDesktopShortcut', []);
     }
 };

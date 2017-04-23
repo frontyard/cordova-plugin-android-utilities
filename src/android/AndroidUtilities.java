@@ -29,6 +29,7 @@ import android.content.*;
 import android.content.pm.*;
 import android.util.*;
 import java.lang.reflect.*;
+import java.util.*;
 import org.apache.cordova.*;
 import org.json.*;
 
@@ -36,30 +37,42 @@ import org.json.*;
  * AndroidUtilities Cordova Plugin
  *
  * @author Nedim Cholich
- * @since 1.0.0
  */
 public class AndroidUtilities extends CordovaPlugin {
     private static final String TAG = "AndroidUtilities";
+    private Map<String, String> appInfo = new HashMap<String, String>();
+
+    public void initialize(CordovaInterface cordova, CordovaWebView webView) {
+        super.initialize(cordova, webView);
+        Log.i(TAG, "Initializing AndroidUtilities");
+        populateApplicationInfo();
+    }
 
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        PluginResult.Status status = PluginResult.Status.NO_RESULT;
         try {
-            if (action.equals("shortcut")) {
-                status = addDesktopShortcut(callbackContext);
+            if (action.equals("createDesktopShortcut")) {
+                createDesktopShortcut(callbackContext);
+                return true;
+            }
+            else if (action.equals("getApplicationInfo")) {
+                getApplicationInfo(callbackContext);
+                return true;
             }
         }
-        catch(Exception ex) {
+        catch (Exception ex) {
             Log.e(TAG, "Failed to execute action '" + action + "'", ex);
-            status = PluginResult.Status.ERROR;
+            callbackContext.error(ex.getMessage());
         }
-
-        PluginResult result = new PluginResult(status);
-        callbackContext.sendPluginResult(result);
 
         return true;
     }
 
-    private PluginResult.Status addDesktopShortcut(CallbackContext callbackContext) throws ClassNotFoundException {
+    /**
+     * Add desktop shortcut for your Cordova app.
+     *
+     * @param callbackContext
+     */
+    private void createDesktopShortcut(CallbackContext callbackContext) {
         Activity activity = cordova.getActivity();
         String packageName = activity.getPackageName();
         CharSequence displayName = null;
@@ -89,17 +102,169 @@ public class AndroidUtilities extends CordovaPlugin {
                 addIntent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
                 activity.sendBroadcast(addIntent);
 
-                Log.d(TAG, "Created desktop shortcut for " + displayName);
-                return PluginResult.Status.OK;
+                callbackContext.success();
             }
             else {
-                Log.i(TAG, "Failed to created shortcut, no displayName");
-                return PluginResult.Status.ERROR;
+                callbackContext.error("Failed to created shortcut, no displayName");
             }
         }
         catch (PackageManager.NameNotFoundException ex) {
-            Log.e(TAG, "Failed to create shortcut, no packageName", ex);
-            return PluginResult.Status.ERROR;
+            callbackContext.error("Failed to create shortcut, package name not found");
         }
+        catch (ClassNotFoundException ex) {
+            callbackContext.error("Failed to create shortcut, main activity class not found");
+        }
+    }
+
+    private void getApplicationInfo(CallbackContext callbackContext) {
+        callbackContext.success(new org.json.JSONObject(appInfo));
+    }
+
+    /**
+     * Get app info.
+     * Borrowed from https://github.com/lynrin/cordova-plugin-buildinfo
+     *
+     * @param callbackContext
+     */
+    private void populateApplicationInfo() {
+        Log.i(TAG, "Getting app info");
+        Activity activity = cordova.getActivity();
+        String packageName = activity.getPackageName();
+        String buildConfigClassName = packageName + ".BuildConfig";
+        String basePackageName = packageName;
+        CharSequence displayName = "";
+
+        PackageManager pm = activity.getPackageManager();
+        try {
+            PackageInfo pi = pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
+
+            if (null != pi.applicationInfo) {
+                displayName = pi.applicationInfo.loadLabel(pm);
+            }
+        }
+        catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        Class c = null;
+        try {
+            c = Class.forName(buildConfigClassName);
+        }
+        catch (ClassNotFoundException e) {
+        }
+
+        if (null == c) {
+            basePackageName = activity.getClass().getPackage().getName();
+            buildConfigClassName = basePackageName + ".BuildConfig";
+
+            try {
+                c = Class.forName(buildConfigClassName);
+            }
+            catch (ClassNotFoundException e) {
+                Log.e(TAG, "BuildConfig ClassNotFoundException", e);
+                return;
+            }
+        }
+
+        appInfo.put("debug", String.valueOf(getClassFieldBoolean(c, "DEBUG", false)));
+        appInfo.put("displayName", displayName.toString());
+        appInfo.put("basePackageName", basePackageName);
+        appInfo.put("packageName", packageName);
+        appInfo.put("versionName", getClassFieldString(c, "VERSION_NAME", ""));
+        appInfo.put("versionCode", String.valueOf(getClassFieldInt(c, "VERSION_CODE", 0)));
+        appInfo.put("buildType", getClassFieldString(c, "BUILD_TYPE", ""));
+        appInfo.put("flavor", getClassFieldString(c, "FLAVOR", ""));
+    }
+
+    /**
+     * Get boolean of field from Class
+     *
+     * @param klass
+     * @param fieldName
+     * @param defaultValue
+     * @return
+     */
+    private static boolean getClassFieldBoolean(Class klass, String fieldName, boolean defaultValue) {
+        boolean value = defaultValue;
+        Field field = getClassField(klass, fieldName);
+
+        if (null != field) {
+            try {
+                value = field.getBoolean(klass);
+            }
+            catch (IllegalAccessException ex) {
+                Log.e(TAG, "Failed to get boolean field " + fieldName + " from class " + klass.getName(), ex);
+            }
+        }
+
+        return value;
+    }
+
+    /**
+     * Get string of field from Class
+     *
+     * @param klass
+     * @param fieldName
+     * @param defaultValue
+     * @return
+     */
+    private static String getClassFieldString(Class klass, String fieldName, String defaultValue) {
+        String value = defaultValue;
+        Field field = getClassField(klass, fieldName);
+
+        if (null != field) {
+            try {
+                value = (String) field.get(klass);
+            }
+            catch (IllegalAccessException ex) {
+                Log.e(TAG, "Failed to get string field " + fieldName + " from class " + klass.getName(), ex);
+            }
+        }
+
+        return value;
+    }
+
+    /**
+     * Get int of field from Class
+     *
+     * @param klass
+     * @param fieldName
+     * @param defaultValue
+     * @return
+     */
+    private static int getClassFieldInt(Class klass, String fieldName, int defaultValue) {
+        int value = defaultValue;
+        Field field = getClassField(klass, fieldName);
+
+        if (null != field) {
+            try {
+                value = field.getInt(klass);
+            }
+            catch (IllegalAccessException ex) {
+                Log.e(TAG, "Failed to get int field " + fieldName + " from class " + klass.getName(), ex);
+            }
+        }
+
+        return value;
+    }
+
+    /**
+     * Get field from Class
+     *
+     * @param klass
+     * @param fieldName
+     * @return
+     */
+    private static Field getClassField(Class klass, String fieldName) {
+        Field field = null;
+
+        try {
+            field = klass.getField(fieldName);
+        }
+        catch (NoSuchFieldException ex) {
+            Log.e(TAG, "Failed to get field " + fieldName + " from class " + klass.getName(), ex);
+        }
+
+        return field;
     }
 }

@@ -5,8 +5,22 @@ Collection of various utilities for Cordova/Phonegap apps.
 
 Create desktop shortcut for your Cordova app:
 ```js
-window.AndroidUtilities.shortcut();
+window.AndroidUtilities.createDesktopShortcut(successCallback, errorCallback);
 ```
+
+Get application build info
+```js
+window.AndroidUtilities.getApplicationInfo(successCallback, errorCallback)
+```
+successCallback will receive application build info through it's first parameter. Following properties are available:
+* debug
+* displayName
+* basePackageName
+* packageName
+* versionName
+* versionCode
+* buildType
+* flavor
 
 ## Installation
 
