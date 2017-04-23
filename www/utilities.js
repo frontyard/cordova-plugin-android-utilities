@@ -29,5 +29,14 @@ module.exports = {
     },
     createDesktopShortcut: function (successCallback, errorCallback) {
         cordova.exec(successCallback, errorCallback, 'AndroidUtilities', 'createDesktopShortcut', []);
+    },
+    installApk: function (fullPath, successCallback, errorCallback) {
+        cordova.exec(successCallback, errorCallback, 'AndroidUtilities', 'installApk', [fullPath]);
+    },
+    uninstallApk: function (packageName, successCallback, errorCallback) {
+        cordova.exec(successCallback, errorCallback, 'AndroidUtilities', 'uninstallApk', [packageName]);
+    },
+    isApkInstalled: function (packageName, successCallback, errorCallback) {
+        cordova.exec(successCallback, errorCallback, 'AndroidUtilities', 'isApkInstalled', [packageName]);
     }
 };

@@ -27,8 +27,12 @@ package co.frontyard.cordova.plugin.utilities;
 import android.app.*;
 import android.content.*;
 import android.content.pm.*;
+import android.net.*;
+import android.os.Build;
 import android.util.*;
+import android.webkit.MimeTypeMap;
 import java.lang.reflect.*;
+import java.io.*;
 import java.util.*;
 import org.apache.cordova.*;
 import org.json.*;
@@ -57,6 +61,15 @@ public class AndroidUtilities extends CordovaPlugin {
             else if (action.equals("getApplicationInfo")) {
                 getApplicationInfo(callbackContext);
                 return true;
+            }
+            else if (action.equals("installApk")) {
+                installApk(callbackContext, args.getString(0));
+            }
+            else if (action.equals("uninstallApk")) {
+                uninstallApk(callbackContext, args.getString(0));
+            }
+            else if (action.equals("isApkInstalled")) {
+                isApkInstalled(callbackContext, args.getString(0));
             }
         }
         catch (Exception ex) {
@@ -266,5 +279,67 @@ public class AndroidUtilities extends CordovaPlugin {
         }
 
         return field;
+    }
+
+    private static String getMimeType(String path) {
+        String mimeType = null;
+        String extension = MimeTypeMap.getFileExtensionFromUrl(path);
+        if (extension != null) {
+            MimeTypeMap mime = MimeTypeMap.getSingleton();
+            mimeType = mime.getMimeTypeFromExtension(extension);
+        }
+        return mimeType;
+    }
+
+    private void installApk(CallbackContext callbackContext, String fullPath) {
+        if (null == fullPath) {
+            callbackContext.error("Must provide full path to the apk file");
+        }
+        else {
+            //String mime = "application/vnd.android.package-archive";
+            String mime = getMimeType(fullPath);
+            Uri uri = Uri.parse(fullPath);
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            if (Build.VERSION.SDK_INT > 15) {
+                intent.setDataAndTypeAndNormalize(uri, mime); // API Level 16 -> Android 4.1
+            }
+            else {
+                intent.setDataAndType(uri, mime);
+            }
+            //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            Activity activity = cordova.getActivity();
+            activity.startActivity(intent);
+            callbackContext.success();
+        }
+    }
+
+    private void uninstallApk(CallbackContext callbackContext, String packageName) {
+        if (null == packageName) {
+            callbackContext.error("Must provide package name of the apk file");
+        }
+        else {
+            Intent intent = new Intent(Intent.ACTION_DELETE);
+            intent.setData(Uri.parse("package:" + packageName));
+            Activity activity = cordova.getActivity();
+            activity.startActivity(intent);
+            callbackContext.success();
+        }
+    }
+
+    private void isApkInstalled(CallbackContext callbackContext, String packageName) {
+        if (null == packageName) {
+            callbackContext.error("Must provide package name of the apk file");
+        }
+        else {
+            try {
+                Activity activity = cordova.getActivity();
+                PackageManager pm = activity.getPackageManager();
+                pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
+                callbackContext.success();
+            }
+            catch (PackageManager.NameNotFoundException e) {
+                callbackContext.error("Apk " + packageName + " is not installed");
+            }
+        }
     }
 }

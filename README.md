@@ -8,7 +8,7 @@ Create desktop shortcut for your Cordova app:
 window.AndroidUtilities.createDesktopShortcut(successCallback, errorCallback);
 ```
 
-Get application build info
+Get application build info:
 ```js
 window.AndroidUtilities.getApplicationInfo(successCallback, errorCallback)
 ```
@@ -21,6 +21,21 @@ successCallback will receive application build info through its first parameter.
 * versionCode
 * buildType
 * flavor
+
+Install apk:
+```js
+window.AndroidUtilities.installApk(fullPath, successCallback, errorCallback)
+```
+
+Uninstall application:
+```js
+window.AndroidUtilities.uninstallApk(packageName, successCallback, errorCallback)
+```
+
+Check if application is installed:
+```js
+window.AndroidUtilities.isApkInstalled(packageName, successCallback, errorCallback)
+```
 
 ## Installation
 
