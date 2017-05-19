@@ -27,6 +27,7 @@ package co.frontyard.cordova.plugin.utilities;
 import android.app.*;
 import android.content.*;
 import android.content.pm.*;
+import android.media.AudioManager;
 import android.net.*;
 import android.os.Build;
 import android.util.*;
@@ -64,20 +65,30 @@ public class AndroidUtilities extends CordovaPlugin {
             }
             else if (action.equals("installApk")) {
                 installApk(callbackContext, args.getString(0));
+                return true;
             }
             else if (action.equals("uninstallApk")) {
                 uninstallApk(callbackContext, args.getString(0));
+                return true;
             }
             else if (action.equals("isApkInstalled")) {
                 isApkInstalled(callbackContext, args.getString(0));
+                return true;
+            }
+            else if (action.equals("getAudioVolume")) {
+                getAudioVolume(callbackContext);
+                return true;
+            }
+            else if (action.equals("setAudioVolume")) {
+                setAudioVolume(callbackContext, args.getInt(0));
+                return true;
             }
         }
         catch (Exception ex) {
             Log.e(TAG, "Failed to execute action '" + action + "'", ex);
             callbackContext.error(ex.getMessage());
         }
-
-        return true;
+        return false;
     }
 
     /**
@@ -134,7 +145,7 @@ public class AndroidUtilities extends CordovaPlugin {
     }
 
     /**
-     * Get app info.
+     * Initializes application build info. Will be returned from #getApplicationInfo
      * Borrowed from https://github.com/lynrin/cordova-plugin-buildinfo
      *
      * @param callbackContext
@@ -313,6 +324,11 @@ public class AndroidUtilities extends CordovaPlugin {
         }
     }
 
+    /**
+     * Uninstalles APK through PackageManager. Will prompt user for confirmation.
+     * @param callbackContext
+     * @param packageName
+     */
     private void uninstallApk(CallbackContext callbackContext, String packageName) {
         if (null == packageName) {
             callbackContext.error("Must provide package name of the apk file");
@@ -326,6 +342,11 @@ public class AndroidUtilities extends CordovaPlugin {
         }
     }
 
+    /**
+     * Uses PackageManager to check if specific APK is installed on the system.
+     * @param callbackContext
+     * @param packageName
+     */
     private void isApkInstalled(CallbackContext callbackContext, String packageName) {
         if (null == packageName) {
             callbackContext.error("Must provide package name of the apk file");
@@ -341,5 +362,32 @@ public class AndroidUtilities extends CordovaPlugin {
                 callbackContext.error("Apk " + packageName + " is not installed");
             }
         }
+    }
+
+    /**
+     * Set audio volume.
+     * @param volume normalized int value between 0 and 100
+     * @return
+     * @throws Exception
+     */
+    private void setAudioVolume(CallbackContext callbackContext, int volume) throws Exception {
+        Activity activity = cordova.getActivity();
+        AudioManager am = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
+        int max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        int newVolume = (volume > 100 ? 100 : volume < 0 ? 0 : volume) * max / 100;
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, newVolume, 0);
+        callbackContext.success();
+    }
+
+    /**
+     * Get audio volume. Sends int value noramlized between 0 and 100.
+     */
+    protected void getAudioVolume(CallbackContext callbackContext) {
+        Activity activity = cordova.getActivity();
+        AudioManager am = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
+        int current = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+        int max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        int volume = Math.round((current * 100) / max);
+        callbackContext.success(volume);
     }
 }

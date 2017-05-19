@@ -38,5 +38,11 @@ module.exports = {
     },
     isApkInstalled: function (packageName, successCallback, errorCallback) {
         cordova.exec(successCallback, errorCallback, 'AndroidUtilities', 'isApkInstalled', [packageName]);
+    },
+    getAudioVolume: function (successCallback, errorCallback) {
+        cordova.exec(successCallback, errorCallback, 'AndroidUtilities', 'getAudioVolume', []);
+    },
+    setAudioVolume: function (newVolume, successCallback, errorCallback) {
+        cordova.exec(successCallback, errorCallback, 'AndroidUtilities', 'setAudioVolume', [newVolume]);
     }
 };
