@@ -2,7 +2,7 @@
 <plugin
 	xmlns="http://apache.org/cordova/ns/plugins/1.0"
 	id="cordova-plugin-android-utilities"
-	version="1.1.0">
+	version="1.2.0">
 	<name>AndroidUtilities</name>
 	<description>Collection of various utilities for Cordova/Phonegap apps.</description>
 	<license>MIT</license>

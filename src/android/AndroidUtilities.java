@@ -53,42 +53,67 @@ public class AndroidUtilities extends CordovaPlugin {
         populateApplicationInfo();
     }
 
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        try {
-            if (action.equals("createDesktopShortcut")) {
-                createDesktopShortcut(callbackContext);
-                return true;
-            }
-            else if (action.equals("getApplicationInfo")) {
-                getApplicationInfo(callbackContext);
-                return true;
-            }
-            else if (action.equals("installApk")) {
-                installApk(callbackContext, args.getString(0));
-                return true;
-            }
-            else if (action.equals("uninstallApk")) {
-                uninstallApk(callbackContext, args.getString(0));
-                return true;
-            }
-            else if (action.equals("isApkInstalled")) {
-                isApkInstalled(callbackContext, args.getString(0));
-                return true;
-            }
-            else if (action.equals("getAudioVolume")) {
-                getAudioVolume(callbackContext);
-                return true;
-            }
-            else if (action.equals("setAudioVolume")) {
-                setAudioVolume(callbackContext, args.getInt(0));
-                return true;
-            }
+    public boolean execute(final String action, final JSONArray args, final CallbackContext callbackContext) throws JSONException {
+        if (action.equals("createDesktopShortcut")) {
+            cordova.getThreadPool().execute(new Runnable() {
+                public void run() {
+                    createDesktopShortcut(callbackContext);
+                }
+            });
+            return true;
         }
-        catch (Exception ex) {
-            Log.e(TAG, "Failed to execute action '" + action + "'", ex);
-            callbackContext.error(ex.getMessage());
+        else if (action.equals("getApplicationInfo")) {
+            cordova.getThreadPool().execute(new Runnable() {
+                public void run() {
+                    getApplicationInfo(callbackContext);
+                }
+            });
+            return true;
         }
-        return false;
+        else if (action.equals("installApk")) {
+            cordova.getThreadPool().execute(new Runnable() {
+                public void run() {
+                    installApk(callbackContext, args.optString(0, null));
+                }
+            });
+            return true;
+        }
+        else if (action.equals("uninstallApk")) {
+            cordova.getThreadPool().execute(new Runnable() {
+                public void run() {
+                    uninstallApk(callbackContext, args.optString(0, null));
+                }
+            });
+            return true;
+        }
+        else if (action.equals("isApkInstalled")) {
+            cordova.getThreadPool().execute(new Runnable() {
+                public void run() {
+                    isApkInstalled(callbackContext, args.optString(0, null));
+                }
+            });
+            return true;
+        }
+        else if (action.equals("getAudioVolume")) {
+            cordova.getThreadPool().execute(new Runnable() {
+                public void run() {
+                    getAudioVolume(callbackContext);
+                }
+            });
+            return true;
+        }
+        else if (action.equals("setAudioVolume")) {
+            cordova.getThreadPool().execute(new Runnable() {
+                public void run() {
+                    setAudioVolume(callbackContext, args.optInt(0, 100));
+                }
+            });
+            return true;
+        }
+        else {
+            callbackContext.error("Action '" + action + "' not recognized");
+            return false;
+        }
     }
 
     /**
@@ -326,6 +351,7 @@ public class AndroidUtilities extends CordovaPlugin {
 
     /**
      * Uninstalles APK through PackageManager. Will prompt user for confirmation.
+     *
      * @param callbackContext
      * @param packageName
      */
@@ -344,6 +370,7 @@ public class AndroidUtilities extends CordovaPlugin {
 
     /**
      * Uses PackageManager to check if specific APK is installed on the system.
+     *
      * @param callbackContext
      * @param packageName
      */
@@ -366,11 +393,12 @@ public class AndroidUtilities extends CordovaPlugin {
 
     /**
      * Set audio volume.
+     *
      * @param volume normalized int value between 0 and 100
      * @return
      * @throws Exception
      */
-    private void setAudioVolume(CallbackContext callbackContext, int volume) throws Exception {
+    private void setAudioVolume(CallbackContext callbackContext, int volume) {
         Activity activity = cordova.getActivity();
         AudioManager am = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
         int max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
